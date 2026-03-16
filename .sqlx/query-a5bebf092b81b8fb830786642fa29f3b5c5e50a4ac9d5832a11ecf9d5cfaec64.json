@@ -1,0 +1,60 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            id,\n            content,\n            ST_X(location)  AS \"longitude!: f64\",\n            ST_Y(location)  AS \"latitude!: f64\",\n            likes,\n            created_at,\n            ST_Distance(\n                location::geography,\n                ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography\n            ) AS \"distance_meters!: f64\"\n        FROM messages\n        WHERE ST_DWithin(\n            location::geography,\n            ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography,\n            $3\n        )\n        ORDER BY 7 ASC  -- column 7 = distance_meters (alias contains SQLx annotation, can't reference by name)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "longitude!: f64",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 3,
+        "name": "latitude!: f64",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "likes",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "distance_meters!: f64",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Float8",
+        "Float8",
+        "Float8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "a5bebf092b81b8fb830786642fa29f3b5c5e50a4ac9d5832a11ecf9d5cfaec64"
+}

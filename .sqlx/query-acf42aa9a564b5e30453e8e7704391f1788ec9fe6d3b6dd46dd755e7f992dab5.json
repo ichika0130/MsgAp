@@ -1,0 +1,54 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO messages (content, location)\n        VALUES (\n            $1,\n            ST_SetSRID(ST_MakePoint($2, $3), 4326)\n        )\n        RETURNING\n            id,\n            content,\n            ST_X(location) AS \"longitude!: f64\",\n            ST_Y(location) AS \"latitude!: f64\",\n            likes,\n            created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "longitude!: f64",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 3,
+        "name": "latitude!: f64",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 4,
+        "name": "likes",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Float8",
+        "Float8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "acf42aa9a564b5e30453e8e7704391f1788ec9fe6d3b6dd46dd755e7f992dab5"
+}

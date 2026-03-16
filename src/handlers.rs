@@ -6,6 +6,7 @@ use axum::{
 use sqlx::PgPool;
 use tracing::instrument;
 
+use crate::error::AppError;
 use crate::models::{
     CreateMessageRequest, CreateMessageResponse, NearbyMessageResponse, NearbyQuery,
 };
@@ -19,7 +20,9 @@ const READABLE_RADIUS_METRES: f64 = 50.0;
 pub async fn create_message(
     State(pool): State<PgPool>,
     Json(req): Json<CreateMessageRequest>,
-) -> Result<(StatusCode, Json<CreateMessageResponse>), (StatusCode, String)> {
+) -> Result<(StatusCode, Json<CreateMessageResponse>), AppError> {
+    req.validate()?;
+
     // ST_MakePoint expects (longitude, latitude) — i.e. (x, y)
     let row = sqlx::query!(
         r#"
@@ -41,8 +44,7 @@ pub async fn create_message(
         req.latitude,  // y
     )
     .fetch_one(&pool)
-    .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    .await?;
 
     Ok((
         StatusCode::CREATED,
@@ -63,7 +65,9 @@ pub async fn create_message(
 pub async fn get_nearby_messages(
     State(pool): State<PgPool>,
     Query(params): Query<NearbyQuery>,
-) -> Result<Json<Vec<NearbyMessageResponse>>, (StatusCode, String)> {
+) -> Result<Json<Vec<NearbyMessageResponse>>, AppError> {
+    params.validate()?;
+
     // Cast both geometries to `geography` so that ST_DWithin / ST_Distance
     // operate in metres on a spheroid rather than in degrees.
     let rows = sqlx::query!(
@@ -85,15 +89,14 @@ pub async fn get_nearby_messages(
             ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography,
             $3
         )
-        ORDER BY distance_meters ASC
+        ORDER BY 7 ASC  -- column 7 = distance_meters (alias contains SQLx annotation, can't reference by name)
         "#,
         params.latitude,  // $1 — y
         params.longitude, // $2 — x
         params.radius,    // $3 — metres
     )
     .fetch_all(&pool)
-    .await
-    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    .await?;
 
     let messages = rows
         .into_iter()

@@ -1,0 +1,9 @@
+[errors.validation]
+invalid_coords   = "Thy position is unstable in this realm."
+content_empty    = "Thy message is silence — speak thy truth."
+content_too_long = "Thy message exceedeth the limits of the stone."
+invalid_radius   = "The search radius lieth beyond the known lands."
+
+[errors.database]
+connection_lost = "The link to the bonfire hath been severed."
+not_found       = "No ember burneth at this location."

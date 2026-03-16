@@ -30,6 +30,7 @@ tower-http = { version = "0.5", features = ["trace"] }
 
 # Config
 dotenvy = "0.15"
+toml    = "0.8"
 
 # Error handling
 anyhow = "1"

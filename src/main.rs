@@ -1,3 +1,5 @@
+mod config;
+mod error;
 mod handlers;
 mod models;
 
@@ -14,6 +16,9 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 async fn main() -> anyhow::Result<()> {
     // Load .env before anything else (fails silently if missing)
     let _ = dotenvy::dotenv();
+
+    // Load flavour-text / error strings from disk once at startup
+    config::init("strings.toml");
 
     // Tracing — default to INFO, override via RUST_LOG env var
     tracing_subscriber::registry()
