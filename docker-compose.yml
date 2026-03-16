@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: msgap_db
+    environment:
+      POSTGRES_USER: msgap
+      POSTGRES_PASSWORD: msgap_secret
+      POSTGRES_DB: msgap
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U msgap -d msgap"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
